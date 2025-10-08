@@ -88,13 +88,15 @@ struct Cli {
     #[clap(value_enum)]
     command: Command,
 
-    /// Node number to operate on, or 'all' for all nodes (default: all)
+    /// Node number to operate on, or 'all' for all nodes
     #[clap(long = "node", value_parser = parse_node_selector, default_value = "all")]
     node: NodeSelector,
 
+    /// Enable or disable the auto fan speed mode that comes with the LPI3H
     #[clap(long = "fan-mode", value_enum, default_value = "disabled")]
     fan_mode: FanMode,
 
+    /// Manually set the fan speed. Requires the fan_mode to be set at disabled
     #[clap(long = "fan-speed", value_parser = parse_fan_speed, default_value = "4")]
     fan_speed: FanSpeed,
 }
