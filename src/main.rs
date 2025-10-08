@@ -1,24 +1,25 @@
-use std::fmt::Display;
+use std::{fmt::Display, io::Read};
 
 use clap::Parser;
+use serde_derive::{Deserialize, Serialize};
 
 use crate::commands::{fan, power};
 
 mod commands;
 
-#[derive(Debug)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct Config {
     ssh_username: String,
     cluster: Cluster,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Serialize, Deserialize)]
 struct Cluster {
     _ip_address: String,
     nodes: Vec<Node>,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Serialize, Deserialize)]
 struct Node {
     _ip_address: String,
     hostname: String,
@@ -26,7 +27,7 @@ struct Node {
     slot_number: i32,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Serialize, Deserialize)]
 enum Model {
     CM5,
     CM4,
@@ -36,43 +37,43 @@ enum Model {
 impl Default for Config {
     fn default() -> Self {
         Config {
-            ssh_username: "akazem".to_owned(),
+            ssh_username: "".to_owned(),
             cluster: Cluster {
-                _ip_address: "131.254.100.102".to_owned(),
+                _ip_address: "".to_owned(),
                 nodes: vec![
                     Node {
-                        _ip_address: "131.254.100.100".to_owned(),
-                        hostname: "lpi3h-0".to_owned(),
+                        _ip_address: "".to_owned(),
+                        hostname: "".to_owned(),
                         model: Model::LPI3H,
                         slot_number: 1,
                     },
                     Node {
-                        _ip_address: "131.254.100.96".to_owned(),
-                        hostname: "cm4-0".to_owned(),
+                        _ip_address: "".to_owned(),
+                        hostname: "".to_owned(),
                         model: Model::CM4,
                         slot_number: 2,
                     },
                     Node {
-                        _ip_address: "131.254.100.29".to_owned(),
-                        hostname: "cm4-1".to_owned(),
+                        _ip_address: "".to_owned(),
+                        hostname: "".to_owned(),
                         model: Model::CM4,
                         slot_number: 3,
                     },
                     Node {
-                        _ip_address: "131.254.100.97".to_owned(),
-                        hostname: "cm5-0".to_owned(),
+                        _ip_address: "".to_owned(),
+                        hostname: "".to_owned(),
                         model: Model::CM5,
                         slot_number: 5,
                     },
                     Node {
-                        _ip_address: "131.254.100.98".to_owned(),
-                        hostname: "cm5-1".to_owned(),
+                        _ip_address: "".to_owned(),
+                        hostname: "".to_owned(),
                         model: Model::CM5,
                         slot_number: 6,
                     },
                     Node {
-                        _ip_address: "131.254.100.99".to_owned(),
-                        hostname: "cm5-2".to_owned(),
+                        _ip_address: "".to_owned(),
+                        hostname: "".to_owned(),
                         model: Model::CM5,
                         slot_number: 7,
                     },
@@ -162,7 +163,16 @@ enum Command {
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     env_logger::init();
     let args = Cli::parse();
-    let config: Config = Default::default();
+    let config: Config = confy::load("nanocluster_control", "nanocluster_control")?;
+    let config_file =
+        confy::get_configuration_file_path("nanocluster_control", "nanocluster_control")?;
+    let mut config_file_content = String::new();
+
+    std::fs::File::open(&config_file)
+        .expect("Failed to open toml configuration file.")
+        .read_to_string(&mut config_file_content)
+        .expect("Failed to read toml configuration file.");
+
     let node_number = match args.node {
         NodeSelector::All => None,
         NodeSelector::Number(n) => Some(n),

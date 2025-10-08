@@ -2,6 +2,12 @@
 name = "nanocluster_control"
 version = "0.1.0"
 edition = "2024"
+authors = ["Ammar Kazem kazem.ammar49@gmail.com"]
+license = "MIT"
+description = "A tool to control power and fan of Sipeed NanoCluster"
+homepage = "https://github.com/Ammar96399/nanocluster_control"
+repository = "https://github.com/Ammar96399/nanocluster_control"
+keywords = ["cli", "nanocluster", "sipeed"]
 
 [dependencies]
 anyhow = "1.0.100"
